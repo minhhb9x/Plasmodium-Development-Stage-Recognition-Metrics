@@ -259,8 +259,9 @@ def load_gt_and_det_folders(gt_folder, det_folder, W, H):
 
 if __name__ == "__main__":
     # W, H = 3072, 2048 # for our 4k images
-    W, H = 1280, 960 # for our IML images
-    class_name = ["R", "T", "S", "G", "Un", "background"]
+    # W, H = 1280, 960 # for our IML images
+    W, H = 1944, 1383 # for our BBBC041 images
+    class_name = ["R", "T", "S", "G", "Un", "Leu", "background"]
     cm = DetectionConfusionMatrix(num_classes=len(class_name)-1, 
                                   class_name=class_name, 
                                   CONF_THRESHOLD=0.25, 
@@ -274,9 +275,9 @@ if __name__ == "__main__":
     # }
 
     args ={
-        'det_dir': 'txt_output/v11m_coco_iml_5_classes_quadrant_500ep_agnostic_conf=0.25',
-        'gt_dir': 'IML_Malaria_5_class/test/labels',
-        'confusion_matrix': 'confusion_matrix/IML/v11m_coco_iml_5_classes_quadrant_500ep_agnostic_conf=0.25' + '.jpg'
+        'det_dir': 'txt_output/v11s_coco_bbbc041_6_classes_quadrant_500ep_agnostic_conf=0.25',
+        'gt_dir': 'BBBC041_6_class/test/labels',
+        'confusion_matrix': 'confusion_matrix/BBBC041/v11s_coco_bbbc041_6_classes_quadrant_500ep_agnostic_conf=0.25' + '.jpg'
         # 'confusion_matrix': 'draft.png'
     }
 

@@ -165,7 +165,7 @@ class DetectionConfusionMatrix:
         array = self.matrix / ((self.matrix.sum(0).reshape(1, -1) + 1e-9) if normalize else 1)  # normalize columns
         array[array < 0.005] = np.nan  # don't annotate (would appear as 0.00)
 
-        fig, ax = plt.subplots(1, 1, figsize=(12, 9), tight_layout=True)
+        fig, ax = plt.subplots(1, 1, figsize=(15, 9), tight_layout=True)
         nc, label_nn = self.num_classes, len(self.class_name)  # number of classes, names
         seaborn.set_theme(font_scale=2.0 if nc < 50 else 0.8)  # for label size
         labels = (0 < label_nn < 99) and (label_nn == nc)  # apply names to ticklabels
@@ -270,8 +270,9 @@ def load_gt_and_det_folders(gt_folder, det_folder, W, H):
 
 if __name__ == "__main__":
     W, H = 3072, 2048
-    class_name = ["R", "T", "S", "G", "Un"]
-    gt_class_name = ["R", "T", "S1", "S2", "G1", "G2-5", "Un", "D"]
+    class_name = ["R", "T", "S", "G", "Uninf"]
+    gt_class_name = ["R", "T", "S1", "S2", "G1", "G2-5", 
+                     "Unp", "UnpArt", "UnpDK", "D"]
 
     # mapping_gt_pred = {
     #                 0: 0, # TJ
@@ -292,9 +293,9 @@ if __name__ == "__main__":
     
     args ={
         'det_dir': 'txt_output/v11s_coco_v2data_PA7_5_classes_quadrant_500ep_agnostic_conf=0.25',
-        'gt_dir': 'v2_malaria_PA7_5_class/test/labels',
-        'gt_dir': 'v2_malaria_PA8_8_class/test/labels',
-        'confusion_matrix': 'rectangle_' + 'v11s_coco_v2data_PA7_5_classes_quadrant_500ep_agnostic_conf=0.25' + '.jpg'
+        'gt_dir': 'v2_malaria_PA9_10_class/test/labels',
+        'confusion_matrix': 'confusion_matrix/our_data/' + 'rectangle_' + \
+              'v11s_coco_v2data_PA7_5_classes_quadrant_500ep_agnostic_conf=0.25' + '.jpg'
         # 'confusion_matrix': 'draft.png'
     }
 

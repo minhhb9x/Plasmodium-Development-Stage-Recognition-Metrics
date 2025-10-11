@@ -17,3 +17,13 @@ python pascalvoc.py `
 -imgsize 3072,2048 `
 -sp runs `
 -np 
+
+python pascalvoc.py `
+-gt BBBC041_6_class/test/labels `
+-det txt_output/v11m_coco_bbbc041_6_classes_quadrant_500ep_agnostic_conf=0.25 `
+-t 0.5 `
+-gtcoords rel `
+-detcoords rel `
+-imgsize 1944,1383 `
+-sp runs `
+-np 
