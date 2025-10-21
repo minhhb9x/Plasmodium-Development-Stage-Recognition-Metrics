@@ -1,6 +1,6 @@
 python pascalvoc.py `
 -gt v2_malaria_PA7_5_class/test/labels `
--det txt_output/v11m_coco_v2data_PA7_5_classes_500ep_agnostic_conf=0.25 `
+-det txt_output/v11m_coco_v2data_PA7_5_classes_quadrant_500ep_agnostic_conf=0.25 `
 -t 0.5 `
 -gtcoords rel `
 -detcoords rel `
@@ -10,17 +10,17 @@ python pascalvoc.py `
 
 python pascalvoc.py `
 -gt IML_Malaria_5_class/test/labels `
--det txt_output/v11m_coco_iml_5_classes_quadrant_500ep_agnostic_conf=0.25 `
+-det txt_output/v11m_coco_iml_5_classes_500ep_agnostic_conf=0.25 `
 -t 0.5 `
 -gtcoords rel `
 -detcoords rel `
--imgsize 3072,2048 `
+-imgsize 1280,960 `
 -sp runs `
 -np 
 
 python pascalvoc.py `
 -gt BBBC041_6_class/test/labels `
--det txt_output/v11m_coco_bbbc041_6_classes_quadrant_500ep_agnostic_conf=0.25 `
+-det txt_output/v11m_coco_bbbc041_6_classes_500ep_agnostic_conf=0.25 `
 -t 0.5 `
 -gtcoords rel `
 -detcoords rel `

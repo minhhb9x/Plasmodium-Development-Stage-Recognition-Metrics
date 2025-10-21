@@ -3,9 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
-CLASS_NAMES = ['Ring', 'Trophozoite', 'Schizont', 'Gametocyte', 
-               'HealthyRBC', 'Other', 'Difficult', 'Background',
-               'Noname', 'Noname', 'Noname', 'Noname']
 
 def box_iou_calc(boxes1, boxes2):
     # https://github.com/pytorch/vision/blob/master/torchvision/ops/boxes.py

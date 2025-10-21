@@ -18,8 +18,8 @@ class BoundingBox:
         Args:
             imageName: String representing the image name.
             classId: String value representing class id.
-            x: Float value representing the X upper-left coordinate of the bounding box.
-            y: Float value representing the Y upper-left coordinate of the bounding box.
+            x: Float value representing the X upper-left or center coordinate of the bounding box.
+            y: Float value representing the Y upper-left or center coordinate of the bounding box.
             w: Float value representing the width bounding box.
             h: Float value representing the height bounding box.
             typeCoordinates: (optional) Enum (Relative or Absolute) represents if the bounding box
@@ -32,7 +32,7 @@ class BoundingBox:
             classConfidence: (optional) Float value representing the confidence of the detected
             class. If detectionType is Detection, classConfidence needs to be informed.
             format: (optional) Enum (BBFormat.XYWH or BBFormat.XYX2Y2) indicating the format of the
-            coordinates of the bounding boxes. BBFormat.XYWH: <left> <top> <width> <height>
+            coordinates of the bounding boxes. BBFormat.XYWH: <center x> <center y> <width> <height>
             BBFormat.XYX2Y2: <left> <top> <right> <bottom>.
         """
         self._imageName = imageName
@@ -59,10 +59,15 @@ class BoundingBox:
             self._width_img = imgSize[0]
             self._height_img = imgSize[1]
             if format == BBFormat.XYWH:
-                self._x2 = self._w
-                self._y2 = self._h
-                self._w = self._x2 - self._x
-                self._h = self._y2 - self._y
+                # self._x2 = self._w
+                # self._y2 = self._h
+                # self._w = self._x2 - self._x
+                # self._h = self._y2 - self._y
+                self._x = self._x - self._w / 2
+                self._y = self._y - self._h / 2
+                self._x2 = self._x + self._w
+                self._y2 = self._y + self._h
+
             else:
                 raise IOError(
                     'For relative coordinates, the format must be XYWH (x,y,width,height)')
@@ -71,8 +76,14 @@ class BoundingBox:
             self._x = x
             self._y = y
             if format == BBFormat.XYWH:
+                # self._w = w
+                # self._h = h
+                # self._x2 = self._x + self._w
+                # self._y2 = self._y + self._h
                 self._w = w
                 self._h = h
+                self._x = self._x - self._w / 2
+                self._y = self._y - self._h / 2
                 self._x2 = self._x + self._w
                 self._y2 = self._y + self._h
             else:  # format == BBFormat.XYX2Y2: <left> <top> <right> <bottom>.

@@ -70,6 +70,7 @@ In the topics below you can find an overview of the most popular metrics used in
   - [Average Precision](#average-precision)
     - [11-point interpolation](#11-point-interpolation)
     - [Interpolating all  points](#interpolating-all-points)
+- [Confusion matrix](#confusion-matrix)
 - [**How to use this project**](#how-to-use-this-project)
 - [References](#references)
 
@@ -357,6 +358,46 @@ Our default implementation is the same as VOC PASCAL: every point interpolation.
 If you want to reproduce these results, see the **[Sample 2](https://github.com/rafaelpadilla/Object-Detection-Metrics/tree/master/samples/sample_2/)**.
 <!--In order to evaluate your detections, you just need a simple list of `Detection` objects. A `Detection` object is a very simple class containing the class id, class probability and bounding boxes coordinates of the detected objects. This same structure is used for the groundtruth detections.-->
 
+## Confusion matrix
+
+There are 3 files `confusion_matrix.py`, `rec_confusion_matrix.py`, and `rec_confusion_matrix_visualization.py`. Each file has a class `DetectionConfusionMatrix`:
+- In `confusion_matrix.py`, the example of useage is in condition `if __name__ == "__main__`. Specifically, the init args of `DetectionConfusionMatrix` are:
+  ```
+  num_classes
+  class_name # list of class names
+  CONF_THRESHOLD
+  IOU_THRESHOLD
+  ```
+  We also define arguments to read ground truth and prediction:
+  ```
+  det_dir # the directory of prediction in format xywh
+  gt_dir # the directory of ground truth in format xywh
+  confusion_matrix # output directory of confusion matrix
+  ```
+
+- In `rec_confusion_matrix.py`, class `DetectionConfusionMatrix` has an additional argument `gt_class_name`, which is list of ground truth class name
+
+- In `rec_confusion_matrix_visualization`, the false detections are also visualized. `DetectionConfusionMatrix`, derived from that in `rec_confusion_matrix.py`, has an additional argument `pred_gt_matching` to determine which pair gt-det is TP. Example:
+  ```
+  pred_gt_matching["R"]["R"] = 1
+  pred_gt_matching["T"]["T"] = 1
+  pred_gt_matching["S"]["S1"] = 1
+  pred_gt_matching["S"]["S2"] = 1
+  pred_gt_matching["G"]["G1"] = 1
+  pred_gt_matching["G"]["G2-5"] = 1
+  pred_gt_matching["Uninf"]["Unp"] = 1
+  pred_gt_matching["Uninf"]["UnpArt"] = 1
+  pred_gt_matching["Uninf"]["UnpDK"] = 1
+  pred_gt_matching["T"]["R"] = 0
+  # 1 is a correct pair
+  # 0 is an incorrect pair (default)
+  ```
+  We also have additional argument for draw false detection box on images:
+  ```
+  img_dir # directory of testing images
+  save_dir # directory for outputting the result-drawn images
+  ```
+
 ## How to use this project
 
 This project was created to evaluate your detections in a very easy way. If you want to evaluate your algorithm with the most used object detection metrics, you are in the right place.  
@@ -383,7 +424,7 @@ Follow the steps below to start evaluating your detections:
   person 91 42 338 500
   ```
     
-If you prefer, you can also have your bounding boxes in the format: `<class_name> <left> <top> <width> <height>` (see here [**\***](#asterisk) how to use it). In this case, your "2008_000034.txt" would be represented as:
+If you prefer, you can also have your bounding boxes in the format: `<class_name> <center x> <center y> <width> <height>` (see here [**\***](#asterisk) how to use it). In this case, your "2008_000034.txt" would be represented as:
   ```
   bottle 6 234 39 128
   person 1 156 102 180
@@ -395,7 +436,7 @@ If you prefer, you can also have your bounding boxes in the format: `<class_name
 
 - Create a separate detection text file for each image in the folder **detections/**.
 - The names of the detection files must match their correspond ground truth (e.g. "detections/2008_000182.txt" represents the detections of the ground truth: "groundtruths/2008_000182.txt").
-- In these files each line should be in the following format: `<class_name> <left> <top> <right> <bottom> <confidence>` (see here [**\***](#asterisk) how to use it).
+- In these files each line should be in the following format: `<class_name> <confidence> <center x> <center y> <right> <bottom>` (see here [**\***](#asterisk) how to use it).
 - E.g. "2008_000034.txt":
     ```
     bottle 80 1 295 500 0.14981 
@@ -405,7 +446,7 @@ If you prefer, you can also have your bounding boxes in the format: `<class_name
     tvmonitor 388 89 500 196 0.070565  
     ```
 
-Also if you prefer, you could have your bounding boxes in the format: `<class_name> <left> <top> <width> <height> <confidence>`.
+Also if you prefer, you could have your bounding boxes in the format: `<class_name> <confidence> <left> <top> <width> <height>`.
 
 ### Optional arguments
 
