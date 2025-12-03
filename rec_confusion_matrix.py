@@ -114,37 +114,72 @@ class DetectionConfusionMatrix:
         for i in range(self.num_classes + 1):
             print(' '.join(map(str, self.matrix[i])))
 
-    def compute_PR_from_matrix(self, confusion_matrix):
-        precision_recall_metrics = {}
+    def compute_PR_from_matrix(self, cm):
+        precision_recall = {}
+
+        per_class_precision = []
+        per_class_recall = []
+        gt_counts = []
+
+        total_samples = cm.sum()
+
+        # ===== Precision / Recall cho từng class =====
         for i in range(self.num_classes):
-            tp = confusion_matrix[i, i]
-            fp = sum(confusion_matrix[i, :]) - tp
-            fn = sum(confusion_matrix[:, i]) - tp
+            tp = cm[i, i]
+            fp = cm[i, :].sum() - tp
+            fn = cm[:, i].sum() - tp
 
-            precision = tp / (tp + fp) if (tp + fp) != 0 else 0
-            recall = tp / (tp + fn) if (tp + fn) != 0 else 0
+            precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+            recall    = tp / (tp + fn) if (tp + fn) > 0 else 0.0
 
-            precision_recall_metrics[f'precision/{self.class_name[i]}'] = float(precision)
-            precision_recall_metrics[f'recall/{self.class_name[i]}'] = float(recall)
+            precision_recall[f'precision/{self.class_name[i]}'] = precision
+            precision_recall[f'recall/{self.class_name[i]}'] = recall
 
-        # Tổng hợp parasitized (ví dụ từ class 0 đến 3)
-        parasitized_correct = 0
-        parasitized_recall = 0
-        parasitized_precision = 0
+            per_class_precision.append(precision)
+            per_class_recall.append(recall)
+            gt_counts.append(cm[:, i].sum())
 
-        for i in range(4):  # Giả sử parasitized là class 0–3
-            parasitized_correct += confusion_matrix[i, i]
-            parasitized_recall += sum(confusion_matrix[:, i])
-            parasitized_precision += sum(confusion_matrix[i, :])
+        # ===== Precision / Recall cho nhóm PARASITIZED (0–3) =====
+        parasitized = list(range(4))
 
-        precision_recall_metrics['precision/parasitized'] = (
-            parasitized_correct / parasitized_precision if parasitized_precision != 0 else 0
+        precision_par = sum(
+            precision_recall[f'precision/{self.class_name[i]}']
+            for i in parasitized
+        ) / len(parasitized)
+
+        recall_par = sum(
+            precision_recall[f'recall/{self.class_name[i]}']
+            for i in parasitized
+        ) / len(parasitized)
+
+        precision_recall['precision/parasitized'] = precision_par
+        precision_recall['recall/parasitized'] = recall_par
+
+        # ===== Weighted precision / recall (chỉ 4 lớp bệnh) =====
+        gt_counts_par = [gt_counts[i] for i in parasitized]
+        total_gt_par = sum(gt_counts_par)
+
+        # trọng số = GT_i / tổng GT nhóm parasitized
+        weighted_precision_par = sum(
+            precision_recall[f'precision/{self.class_name[i]}'] * (gt_counts[i] / total_gt_par)
+            for i in parasitized
         )
-        precision_recall_metrics['recall/parasitized'] = (
-            parasitized_correct / parasitized_recall if parasitized_recall != 0 else 0
+
+        weighted_recall_par = sum(
+            precision_recall[f'recall/{self.class_name[i]}'] * (gt_counts[i] / total_gt_par)
+            for i in parasitized
         )
 
-        return precision_recall_metrics
+        precision_recall['weighted/precision_parasitized'] = weighted_precision_par
+        precision_recall['weighted/recall_parasitized'] = weighted_recall_par
+
+        # ===== In kết quả =====
+        print("\n===== PRECISION & RECALL =====")
+        for k, v in precision_recall.items():
+            print(f"{k:35s}: {v:.4f}")
+        print("================================\n")
+
+        return precision_recall
     
 
     def plot_matrix(self, save_path="confusion_matrix.png", normalize=False, cmap="Blues"):

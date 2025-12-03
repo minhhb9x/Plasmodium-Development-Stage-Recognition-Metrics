@@ -2,6 +2,7 @@ import os
 import numpy as np
 import cv2
 import colorsys
+import json
 
 def xywhn2xyxy(x, w=640, h=640, padw=0, padh=0):
     """
@@ -38,6 +39,24 @@ def read_gt(path, W, H):
     classes = data[:, 0:1]
     return np.concatenate([classes, boxes], axis=1)
 
+def read_json_gt(path, mapping_gt_index):
+    if not os.path.exists(path) or os.path.getsize(path) == 0:
+        return np.zeros((0, 5))
+
+    with open(path, 'r') as f:
+        data = json.load(f)
+
+    boxes = []
+    for item in data:
+        class_id = mapping_gt_index.get(item['label'], -1)
+        if class_id == -1:
+            continue
+        x1, y1, x2, y2 = item['points']
+        attrs = item.get('attributes', [])  # dict
+        boxes.append([class_id, x1, y1, x2, y2, attrs])
+
+    return np.array(boxes, dtype=object)
+
 def read_det(path, W, H):
     """
     Đọc detection file và chuyển về ndarray (N, 6): [x1, y1, x2, y2, conf, class]
@@ -69,6 +88,24 @@ def load_gt_and_det_folders(gt_folder, det_folder, W, H):
             det = read_det(det_path, W, H)
         else:
             det = np.empty((0, 6))
+
+        result[fname] = (gt, det)
+
+    return result
+
+def load_json_gt_and_txt_det_folders(gt_folder, det_folder, mapping_gt_index, W, H):
+    """
+    Trả về dict {filename: (gt_array, det_array)}
+    Nếu file trong gt_folder không có file tương ứng trong det_folder,
+    thì det_array sẽ là mảng rỗng (0,6)
+    """
+    result = {}
+    for fname in sorted(f for f in os.listdir(gt_folder) if f.endswith('.json')):
+        gt_path = os.path.join(gt_folder, fname)
+        det_path = os.path.join(det_folder, fname.replace('.json', '.txt'))
+
+        gt = read_json_gt(gt_path, mapping_gt_index)
+        det = read_det(det_path, W, H) if os.path.exists(det_path) else np.empty((0, 6))
 
         result[fname] = (gt, det)
 
