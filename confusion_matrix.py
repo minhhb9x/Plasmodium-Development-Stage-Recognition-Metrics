@@ -261,6 +261,7 @@ def read_det(path, W, H):
 
     data = np.loadtxt(path).reshape(-1, 6)
     boxes = xywhn2xyxy(data[:, 1:5], W, H)
+    # boxes = data[:, 1:5]
     confs = data[:, 5:6]
     classes = data[:, 0:1]
     return np.concatenate([boxes, confs, classes], axis=1)
@@ -289,9 +290,9 @@ def load_gt_and_det_folders(gt_folder, det_folder, W, H):
     return result
 
 if __name__ == "__main__":
-    # W, H = 3072, 2048 # for our 4k images
+    W, H = 3072, 2048 # for our 4k images
     # W, H = 1280, 960 # for our IML images
-    W, H = 1944, 1383 # for our BBBC041 images
+    # W, H = 1944, 1383 # for our BBBC041 images
     class_name = ["R", "T", "S", "G", "Un", "Leu", "background"]
     cm = DetectionConfusionMatrix(num_classes=len(class_name)-1, 
                                   class_name=class_name, 
@@ -306,9 +307,11 @@ if __name__ == "__main__":
     # }
 
     args ={
-        'det_dir': 'txt_output/v11m_coco_v2data_PA7_5_classes_500ep_agnostic_conf=0.25',
+        # 'det_dir': 'txt_output/v11m_coco_v2data_PA7_5_classes_500ep_agnostic_conf=0.25',
+        'det_dir': 'txt_output/trong_v11m_v2data_5_classes',
         'gt_dir': 'v2_malaria_PA7_5_class/test/labels',
-        'confusion_matrix': 'confusion_matrix/our_data/v11m_coco_v2data_PA7_5_classes_500ep_agnostic_conf=0.25' + '.jpg'
+        # 'confusion_matrix': 'confusion_matrix/our_data/v11m_coco_v2data_PA7_5_classes_500ep_agnostic_conf=0.25' + '.jpg'
+        'confusion_matrix': 'confusion_matrix/our_data/trong_v11m_v2data_5_classes' + '.jpg'
         # 'confusion_matrix': 'draft.png'
     }
 

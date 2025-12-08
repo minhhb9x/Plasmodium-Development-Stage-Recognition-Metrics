@@ -59,14 +59,14 @@ class BoundingBox:
             self._width_img = imgSize[0]
             self._height_img = imgSize[1]
             if format == BBFormat.XYWH:
-                # self._x2 = self._w
-                # self._y2 = self._h
-                # self._w = self._x2 - self._x
-                # self._h = self._y2 - self._y
-                self._x = self._x - self._w / 2
-                self._y = self._y - self._h / 2
-                self._x2 = self._x + self._w
-                self._y2 = self._y + self._h
+                self._x2 = self._w
+                self._y2 = self._h
+                self._w = self._x2 - self._x
+                self._h = self._y2 - self._y
+                # self._x = self._x - self._w / 2
+                # self._y = self._y - self._h / 2
+                # self._x2 = self._x + self._w
+                # self._y2 = self._y + self._h
 
             else:
                 raise IOError(

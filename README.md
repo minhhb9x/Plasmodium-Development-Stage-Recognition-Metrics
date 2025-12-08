@@ -436,7 +436,7 @@ If you prefer, you can also have your bounding boxes in the format: `<class_name
 
 - Create a separate detection text file for each image in the folder **detections/**.
 - The names of the detection files must match their correspond ground truth (e.g. "detections/2008_000182.txt" represents the detections of the ground truth: "groundtruths/2008_000182.txt").
-- In these files each line should be in the following format: `<class_name> <confidence> <center x> <center y> <right> <bottom>` (see here [**\***](#asterisk) how to use it).
+- In these files each line should be in the following format: `<class_name> <center x> <center y> <right> <bottom> <confidence>` (see here [**\***](#asterisk) how to use it).
 - E.g. "2008_000034.txt":
     ```
     bottle 80 1 295 500 0.14981 
@@ -446,7 +446,7 @@ If you prefer, you can also have your bounding boxes in the format: `<class_name
     tvmonitor 388 89 500 196 0.070565  
     ```
 
-Also if you prefer, you could have your bounding boxes in the format: `<class_name> <confidence> <left> <top> <width> <height>`.
+Also if you prefer, you could have your bounding boxes in the format: `<class_name> <center x> <center y> <width> <height> <confidence>`.
 
 ### Optional arguments
 
