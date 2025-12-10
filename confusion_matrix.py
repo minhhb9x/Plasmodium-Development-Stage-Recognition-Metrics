@@ -2,7 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-
+from utils import box_iou_calc, load_gt_and_det_folders
 
 def box_iou_calc(boxes1, boxes2):
     # https://github.com/pytorch/vision/blob/master/torchvision/ops/boxes.py
@@ -217,83 +217,13 @@ class DetectionConfusionMatrix:
         fig.savefig(plot_fname, dpi=500, bbox_inches='tight')
         plt.close(fig)
 
-def xywhn2xyxy(x, w=640, h=640, padw=0, padh=0):
-    """
-    Convert normalized bounding box coordinates to pixel coordinates.
-
-    Args:
-        x (np.ndarray | torch.Tensor): The bounding box coordinates.
-        w (int): Width of the image.
-        h (int): Height of the image.
-        padw (int): Padding width.
-        padh (int): Padding height.
-
-    Returns:
-        y (np.ndarray | torch.Tensor): The coordinates of the bounding box in the format [x1, y1, x2, y2] where
-            x1,y1 is the top-left corner, x2,y2 is the bottom-right corner of the bounding box.
-    """
-    assert x.shape[-1] == 4, f"input shape last dimension expected 4 but input shape is {x.shape}"
-    y = np.empty_like(x, dtype=np.float32)  # faster than clone/copy
-    y[..., 0] = w * (x[..., 0] - x[..., 2] / 2) + padw  # top left x
-    y[..., 1] = h * (x[..., 1] - x[..., 3] / 2) + padh  # top left y
-    y[..., 2] = w * (x[..., 0] + x[..., 2] / 2) + padw  # bottom right x
-    y[..., 3] = h * (x[..., 1] + x[..., 3] / 2) + padh  # bottom right y
-    return y
-
-def read_gt(path, W, H):
-    """
-    Đọc ground truth file và chuyển về ndarray (N, 5): [class, x1, y1, x2, y2]
-    """
-    if not os.path.exists(path) or os.path.getsize(path) == 0:
-        return np.zeros((0, 5))
-
-    data = np.loadtxt(path).reshape(-1, 5)
-    boxes = xywhn2xyxy(data[:, 1:5], W, H)
-    classes = data[:, 0:1]
-    return np.concatenate([classes, boxes], axis=1)
-
-def read_det(path, W, H):
-    """
-    Đọc detection file và chuyển về ndarray (N, 6): [x1, y1, x2, y2, conf, class]
-    """
-    if not os.path.exists(path) or os.path.getsize(path) == 0:
-        return np.zeros((0, 6))
-
-    data = np.loadtxt(path).reshape(-1, 6)
-    boxes = xywhn2xyxy(data[:, 1:5], W, H)
-    # boxes = data[:, 1:5]
-    confs = data[:, 5:6]
-    classes = data[:, 0:1]
-    return np.concatenate([boxes, confs, classes], axis=1)
-
-def load_gt_and_det_folders(gt_folder, det_folder, W, H):
-    """
-    Trả về dict {filename: (gt_array, det_array)}
-    Nếu file trong gt_folder không có file tương ứng trong det_folder,
-    thì det_array sẽ là mảng rỗng (0,6)
-    """
-    result = {}
-
-    for fname in sorted(f for f in os.listdir(gt_folder) if f.endswith('.txt')):
-        gt_path = os.path.join(gt_folder, fname)
-        det_path = os.path.join(det_folder, fname)
-
-        gt = read_gt(gt_path, W, H)
-
-        if os.path.exists(det_path):
-            det = read_det(det_path, W, H)
-        else:
-            det = np.empty((0, 6))
-
-        result[fname] = (gt, det)
-
-    return result
 
 if __name__ == "__main__":
     W, H = 3072, 2048 # for our 4k images
     # W, H = 1280, 960 # for our IML images
     # W, H = 1944, 1383 # for our BBBC041 images
-    class_name = ["R", "T", "S", "G", "Un", "Leu", "background"]
+    # class_name = ["R", "T", "S", "G", "Un", "Leu", "background"]
+    class_name = ["R", "T", "S", "G", "Un", "background"]
     cm = DetectionConfusionMatrix(num_classes=len(class_name)-1, 
                                   class_name=class_name, 
                                   CONF_THRESHOLD=0.25, 
@@ -307,11 +237,9 @@ if __name__ == "__main__":
     # }
 
     args ={
-        # 'det_dir': 'txt_output/v11m_coco_v2data_PA7_5_classes_500ep_agnostic_conf=0.25',
-        'det_dir': 'txt_output/trong_v11m_v2data_5_classes',
+        'det_dir': 'txt_output/v11m_coco_v2data_PA7_5_classes_500ep_agnostic_conf=0.25',
         'gt_dir': 'v2_malaria_PA7_5_class/test/labels',
-        # 'confusion_matrix': 'confusion_matrix/our_data/v11m_coco_v2data_PA7_5_classes_500ep_agnostic_conf=0.25' + '.jpg'
-        'confusion_matrix': 'confusion_matrix/our_data/trong_v11m_v2data_5_classes' + '.jpg'
+        'confusion_matrix': 'confusion_matrix/our_data/v11m_coco_v2data_PA7_5_classes_500ep_agnostic_conf=0.25' + '.jpg'
         # 'confusion_matrix': 'draft.png'
     }
 

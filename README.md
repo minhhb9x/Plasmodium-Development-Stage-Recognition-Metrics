@@ -370,8 +370,8 @@ There are 3 files `confusion_matrix.py`, `rec_confusion_matrix.py`, and `rec_con
   ```
   We also define arguments to read ground truth and prediction:
   ```
-  det_dir # the directory of prediction in format xywh
-  gt_dir # the directory of ground truth in format xywh
+  det_dir # the directory of prediction in format xywh relative
+  gt_dir # the directory of ground truth in format xywh relative
   confusion_matrix # output directory of confusion matrix
   ```
 
